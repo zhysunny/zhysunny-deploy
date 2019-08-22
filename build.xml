@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+
+<project name="Zhysunny Deploy" default="tar">
+
+
+    <property name="build.dir" value="${basedir}/build"/>
+    <!-- deploy版本号，和deploy.properties一致 -->
+    <property name="build.version" value="1.0"/>
+    <property name="final.name" value="zhysunny-deploy"/>
+
+    <target name="tar" depends="clean">
+        <!-- 创建目录 -->
+        <mkdir dir="${build.dir}"></mkdir>
+        <mkdir dir="${build.dir}/${final.name}"></mkdir>
+        <copydir src="config" dest="${build.dir}/${final.name}/config"></copydir>
+        <copydir src="lib" dest="${build.dir}/${final.name}/lib"></copydir>
+        <copydir src="tools" dest="${build.dir}/${final.name}/tools"></copydir>
+        <copyfile src="README.md" dest="${build.dir}/${final.name}/README.md"></copyfile>
+        <copyfile src="zhysunny_service.sh" dest="${build.dir}/${final.name}/zhysunny_service.sh"></copyfile>
+
+        <tar compression="gzip" longfile="gnu" destfile="${build.dir}/${final.name}-${build.version}.tar.gz">
+            <tarfileset dir="${build.dir}" filemode="644">
+                <include name="${final.name}/lib/**"/>
+                <include name="${final.name}/config/**"/>
+                <include name="${final.name}/*.md"/>
+            </tarfileset>
+            <tarfileset dir="${build.dir}" filemode="777">
+                <include name="${final.name}/*.sh"/>
+                <include name="${final.name}/tools/**"/>
+            </tarfileset>
+        </tar>
+
+        <delete dir="${build.dir}/${final.name}"></delete>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}"></delete>
+    </target>
+
+</project>
