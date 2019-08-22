@@ -41,6 +41,10 @@ LOCAL_TOOLS_PATH=${LOCAL_PATH}/tools
 LOCAL_TOOLS_APPS_PATH=${LOCAL_TOOLS_PATH}/apps
 # 安装目录
 INSTALL_PATH=`awk -F= '{if($1~/^bigdata.install.home$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
+if [[ ! -e ${INSTALL_PATH} ]]
+then
+    mkdir -p ${INSTALL_PATH}
+fi
 # 日志目录
 LOCAL_LOGS_PATH=${LOCAL_PATH}/logs
 if [[ ! -e ${LOCAL_LOGS_PATH} ]]
@@ -56,6 +60,8 @@ LOCAL_VERSION_FILE=${LOCAL_PATH}/version.info
 DEPLOY_VERSION=`awk -F= '{if($1~/^version.deploy$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
 # 修改xml配置的脚本
 MODIFY_CONFIG_XML_VALUE_TOOL=${LOCAL_TOOLS_PATH}/modify_config_xml_value.sh
+# mysql root密码
+MYSQL_ROOT_PASSWORD=`awk -F= '{if($1~/^mysql.root.password$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
 
 export LOCAL_PATH
 export LOCAL_CONFIG_PATH
@@ -68,6 +74,7 @@ export LOCAL_LOGS_FILE
 export ENVIRONMENT_VARIABLE_FILE
 export LOCAL_VERSION_FILE
 export MODIFY_CONFIG_XML_VALUE_TOOL
+export MYSQL_ROOT_PASSWORD
 
 # 步骤
 step=1
@@ -120,6 +127,15 @@ install(){
         echo "Step $step Start install hadoop ..."
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/hadoop_manager.sh install
+        step=$((step+1))
+    fi
+
+    if [[ `contains "hive" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start install hive ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/hive_manager.sh install
         step=$((step+1))
     fi
 
@@ -183,6 +199,15 @@ uninstall(){
         echo "Step $step Start uninstall hadoop ..."
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/hadoop_manager.sh uninstall
+        step=$((step+1))
+    fi
+
+    if [[ `contains "hive" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall hive ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/hive_manager.sh uninstall
         step=$((step+1))
     fi
 

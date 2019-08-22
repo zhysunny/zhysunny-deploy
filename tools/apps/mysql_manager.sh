@@ -77,12 +77,12 @@ install(){
     else
         MYSQL_HOME=`echo ${MYSQL_HOME} | sed 's#\/#\\\/#g'`
         sed -i "s/^export MYSQL_HOME=.*/export MYSQL_HOME=$MYSQL_HOME/g" ${ENVIRONMENT_VARIABLE_FILE}
+        MYSQL_HOME=`echo ${MYSQL_HOME} | sed 's#\\\/#\/#g'`
     fi
     # 增加PATH
-    sed -i 's/export PATH=/export PATH=${MYSQL_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
+    sed -i 's/^export PATH=/export PATH=${MYSQL_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
 	source ${ENVIRONMENT_VARIABLE_FILE}
 	# 设置mysql root密码
-	MYSQL_ROOT_PASSWORD=`awk -F= '{if($1~/^mysql.root.password$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
 	${MYSQL_HOME}/bin/mysql -uroot -e "UPDATE mysql.user SET PASSWORD=PASSWORD(\"$MYSQL_ROOT_PASSWORD\") WHERE USER='root';flush privileges;grant all privileges on *.* to root@'%' identified by \"$MYSQL_ROOT_PASSWORD\" with grant option;"
 
     [[ $? -ne 0 ]] && exit $?

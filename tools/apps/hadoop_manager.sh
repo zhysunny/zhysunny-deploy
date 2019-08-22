@@ -35,16 +35,17 @@ install(){
     # 修改环境变量
     HADOOP_HOME=${installed_file}
     result=(`cat ${ENVIRONMENT_VARIABLE_FILE} | grep "export HADOOP_HOME="`)
-    HADOOP_HOME=`echo ${HADOOP_HOME} | sed 's#\/#\\\/#g'`
     if [[ ${#result[*]} -eq 0 ]]
     then
         # 没有HADOOP_HOME增加
         echo "export HADOOP_HOME=$HADOOP_HOME" >> ${ENVIRONMENT_VARIABLE_FILE}
     else
+        HADOOP_HOME=`echo ${HADOOP_HOME} | sed 's#\/#\\\/#g'`
         sed -i "s/^export HADOOP_HOME=.*/export HADOOP_HOME=$HADOOP_HOME/g" ${ENVIRONMENT_VARIABLE_FILE}
+        HADOOP_HOME=`echo ${HADOOP_HOME} | sed 's#\\\/#\/#g'`
     fi
     # 增加PATH
-    sed -i 's/export PATH=/export PATH=${HADOOP_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
+    sed -i 's/^export PATH=/export PATH=${HADOOP_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
     source ${ENVIRONMENT_VARIABLE_FILE}
 
     # 修改配置
@@ -65,12 +66,12 @@ install(){
     ${MODIFY_CONFIG_XML_VALUE_TOOL} ${HADOOP_CONFIG_PATH}/yarn-site.xml yarn.resourcemanager.resource-tracker.address ${hostname}:8035
     ${MODIFY_CONFIG_XML_VALUE_TOOL} ${HADOOP_CONFIG_PATH}/yarn-site.xml yarn.resourcemanager.admin.address ${hostname}:8033
     ${MODIFY_CONFIG_XML_VALUE_TOOL} ${HADOOP_CONFIG_PATH}/yarn-site.xml yarn.resourcemanager.webapp.address ${hostname}:8088
+    HADOOP_HOME=`echo ${HADOOP_HOME} | sed 's#\\\/#\/#g'`
     JAVA_HOME=`echo ${JAVA_HOME} | sed 's#\/#\\\/#g'`
     sed -i "s/^.*export JAVA_HOME=.*/export JAVA_HOME=$JAVA_HOME/g" ${HADOOP_CONFIG_PATH}/hadoop-env.sh
     sed -i "s/^.*export JAVA_HOME=.*/export JAVA_HOME=$JAVA_HOME/g" ${HADOOP_CONFIG_PATH}/yarn-env.sh
 
     # 初始化namenode
-    HADOOP_HOME=`echo ${HADOOP_HOME} | sed 's#\\\/#\/#g'`
     ${HADOOP_HOME}/bin/hadoop namenode -format >>${LOCAL_LOGS_FILE} 2>&1
     ${HADOOP_HOME}/sbin/start-all.sh
 

@@ -22,7 +22,7 @@ declare -i Dline
 getline()
 {
     # 找到 $PROPERTY_NAME 对应的行号
-	grep -n $PROPERTY_NAME $FILE_NAME | head -1 | cut -d ":" -f 1;
+	grep -n "<name>$PROPERTY_NAME" ${FILE_NAME} | head -1 | cut -d ":" -f 1;
 }
 
 

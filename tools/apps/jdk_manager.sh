@@ -42,9 +42,10 @@ install(){
     else
         JAVA_HOME=`echo ${JAVA_HOME} | sed 's#\/#\\\/#g'`
         sed -i "s/^export JAVA_HOME=.*/export JAVA_HOME=$JAVA_HOME/g" ${ENVIRONMENT_VARIABLE_FILE}
+        JAVA_HOME=`echo ${JAVA_HOME} | sed 's#\\\/#\/#g'`
     fi
     # 增加PATH
-    sed -i 's/export PATH=/export PATH=${JAVA_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
+    sed -i 's/^export PATH=/export PATH=${JAVA_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
     source ${ENVIRONMENT_VARIABLE_FILE}
     [[ $? -ne 0 ]] && exit $?
     echo ""

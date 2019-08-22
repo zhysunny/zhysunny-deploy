@@ -21,7 +21,7 @@ declare -i Dline
 getline()
 {
     # 找到 $PROPERTY_NAME 对应的行号
-	grep -n $PROPERTY_NAME $FILE_NAME | head -1 | cut -d ":" -f 1;
+	grep -n "<name>$PROPERTY_NAME" ${FILE_NAME} | head -1 | cut -d ":" -f 1;
 }
 
 
@@ -33,4 +33,4 @@ getlinenum()
 
 Dline=`getlinenum`;
 # 获取 value 标签的值
-sed -n "${Dline}p" $FILE_NAME | sed 's/.*<.*>\([^<].*\)<.*>.*/\1/'
+sed -n "${Dline}p" ${FILE_NAME} | sed 's/.*<.*>\([^<].*\)<.*>.*/\1/'

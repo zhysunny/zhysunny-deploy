@@ -42,9 +42,10 @@ install(){
     else
         SCALA_HOME=`echo ${SCALA_HOME} | sed 's#\/#\\\/#g'`
         sed -i "s/^export SCALA_HOME=.*/export SCALA_HOME=$SCALA_HOME/g" ${ENVIRONMENT_VARIABLE_FILE}
+        SCALA_HOME=`echo ${SCALA_HOME} | sed 's#\\\/#\/#g'`
     fi
     # 增加PATH
-    sed -i 's/export PATH=/export PATH=${SCALA_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
+    sed -i 's/^export PATH=/export PATH=${SCALA_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
     source ${ENVIRONMENT_VARIABLE_FILE}
     [[ $? -ne 0 ]] && exit $?
     echo ""
