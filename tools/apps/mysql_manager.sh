@@ -9,16 +9,6 @@ Usage()
     exit 1
 }
 
-# parameter is necessary
-if [[ "$1" = "" ]]
-then
-    Usage
-fi
-
-# 当前文件所在目录，这里是相对路径
-LOCAL_PATH=`dirname $0`
-# 当前文件所在目录转为绝对路径
-LOCAL_PATH=`cd ${LOCAL_PATH};pwd`
 MYSQL_VERSION=`awk -F= '{if($1~/^version.mysql$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
 MYSQL_NAME="mysql"
 MYSQL_PACKAGE_NAME=${MYSQL_NAME}
@@ -39,46 +29,27 @@ install(){
 	if [[ -z "`cat /etc/group|grep mysql`" ]]
 	then
 		groupadd mysql
-	else
-		echo "mysql用户组已存在"
 	fi
 	# mysql用户是否存在
 	if [[ -z "`cat /etc/shadow|grep mysql`" ]]
 	then
-		echo "添加mysql用户并设置mysql用户密码"
 		useradd -g mysql mysql
         echo "mysql" | passwd --stdin mysql
-	else
-		echo "mysql用户已存在"
 	fi
 	# mysql数据库是否存在
 	if [[ -z "`ls $installed_file/data`" ]]
 	then
-		echo "开始初始化数据库"
 		chown -R mysql:mysql ${installed_file}
 		${installed_file}/scripts/mysql_install_db --user=mysql --defaults-file=${installed_file}/my.cnf --basedir=${installed_file} --datadir=${installed_file}/data >>${LOCAL_LOGS_FILE} 2>&1
-	else
-		echo "数据库目录已存在，不需要初始化数据库库"
 	fi
-	echo "启动mysql服务,并设置开机自启动"
 	cp ${installed_file}/support-files/mysql.server /etc/init.d/mysqld
 	service mysqld start
 	chkconfig --add mysqld
 	chkconfig --level 345 mysqld on
 
-
     # 修改环境变量
     MYSQL_HOME=${installed_file}
-    result=(`cat ${ENVIRONMENT_VARIABLE_FILE} | grep "export MYSQL_HOME="`)
-    if [[ ${#result[*]} -eq 0 ]]
-    then
-        # 没有MYSQL_HOME增加
-        echo "export MYSQL_HOME=$MYSQL_HOME" >> ${ENVIRONMENT_VARIABLE_FILE}
-    else
-        MYSQL_HOME=`echo ${MYSQL_HOME} | sed 's#\/#\\\/#g'`
-        sed -i "s/^export MYSQL_HOME=.*/export MYSQL_HOME=$MYSQL_HOME/g" ${ENVIRONMENT_VARIABLE_FILE}
-        MYSQL_HOME=`echo ${MYSQL_HOME} | sed 's#\\\/#\/#g'`
-    fi
+    ${PROPERTIES_CONFIG_TOOLS} put ${ENVIRONMENT_VARIABLE_FILE} "MYSQL_HOME" ${MYSQL_HOME} 1
     # 增加PATH
     sed -i 's/^export PATH=/export PATH=${MYSQL_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
 	source ${ENVIRONMENT_VARIABLE_FILE}
@@ -86,11 +57,10 @@ install(){
 	${MYSQL_HOME}/bin/mysql -uroot -e "UPDATE mysql.user SET PASSWORD=PASSWORD(\"$MYSQL_ROOT_PASSWORD\") WHERE USER='root';flush privileges;grant all privileges on *.* to root@'%' identified by \"$MYSQL_ROOT_PASSWORD\" with grant option;"
 
     [[ $? -ne 0 ]] && exit $?
+    ${PROPERTIES_CONFIG_TOOLS} put ${LOCAL_VERSION_FILE} "version.mysql" ${MYSQL_VERSION}
     echo ""
     echo "Install mysql successfully!!!"
     echo ""
-    echo "# mysql版本" >> ${LOCAL_VERSION_FILE}
-    echo "version.mysql=${MYSQL_VERSION}" >> ${LOCAL_VERSION_FILE}
     export MYSQL_HOME
 }
 
@@ -104,19 +74,13 @@ uninstall(){
         rm -rf ${installed_file}
     fi
     # mysql用户是否存在
-	if [[ -z "`cat /etc/shadow|grep mysql`" ]]
+	if [[ -n "`cat /etc/shadow|grep mysql`" ]]
 	then
-		echo "mysql用户不存在"
-	else
-		echo "删除mysql用户"
 		userdel mysql
 	fi
     # mysql用户组是否存在
-	if [[ -z "`cat /etc/group|grep mysql`" ]]
+	if [[ -n "`cat /etc/group|grep mysql`" ]]
 	then
-		echo "mysql用户组不存在"
-	else
-		echo "删除mysql用户组"
 		groupdel mysql
 	fi
     # 删除环境变量

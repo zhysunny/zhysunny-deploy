@@ -9,16 +9,6 @@ Usage()
     exit 1
 }
 
-# parameter is necessary
-if [[ "$1" = "" ]]
-then
-    Usage
-fi
-
-# 当前文件所在目录，这里是相对路径
-LOCAL_PATH=`dirname $0`
-# 当前文件所在目录转为绝对路径
-LOCAL_PATH=`cd ${LOCAL_PATH};pwd`
 SCALA_VERSION=`awk -F= '{if($1~/^version.scala$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
 SCALA_NAME="scala"
 SCALA_PACKAGE_NAME=${SCALA_NAME}-${SCALA_VERSION}
@@ -34,25 +24,15 @@ install(){
     tar -xvf ${SCALA_INSTALL_FILE} -C ${INSTALL_PATH} >>${LOCAL_LOGS_FILE} 2>&1
     # 修改环境变量
     SCALA_HOME=${installed_file}
-    result=(`cat ${ENVIRONMENT_VARIABLE_FILE} | grep "export SCALA_HOME="`)
-    if [[ ${#result[*]} -eq 0 ]]
-    then
-        # 没有SCALA_HOME增加
-        echo "export SCALA_HOME=$SCALA_HOME" >> ${ENVIRONMENT_VARIABLE_FILE}
-    else
-        SCALA_HOME=`echo ${SCALA_HOME} | sed 's#\/#\\\/#g'`
-        sed -i "s/^export SCALA_HOME=.*/export SCALA_HOME=$SCALA_HOME/g" ${ENVIRONMENT_VARIABLE_FILE}
-        SCALA_HOME=`echo ${SCALA_HOME} | sed 's#\\\/#\/#g'`
-    fi
+    ${PROPERTIES_CONFIG_TOOLS} put ${ENVIRONMENT_VARIABLE_FILE} "SCALA_HOME" ${SCALA_HOME} 1
     # 增加PATH
     sed -i 's/^export PATH=/export PATH=${SCALA_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
     source ${ENVIRONMENT_VARIABLE_FILE}
     [[ $? -ne 0 ]] && exit $?
+    ${PROPERTIES_CONFIG_TOOLS} put ${LOCAL_VERSION_FILE} "version.scala" ${SCALA_VERSION}
     echo ""
     echo "Install scala successfully!!!"
     echo ""
-    echo "# scala版本" >> ${LOCAL_VERSION_FILE}
-    echo "version.scala=${SCALA_VERSION}" >> ${LOCAL_VERSION_FILE}
     export SCALA_HOME
 }
 

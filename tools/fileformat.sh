@@ -19,6 +19,7 @@ format(){
         if [[ "$file" == *".sh" ]]
         then
             sed -i 's/\r$//' ${file}
+            sed -i 's/\^M//' ${file}
         fi
     done
 }
@@ -27,3 +28,4 @@ format ${path}
 format ${path}/tools
 format ${path}/tools/apps
 format ${path}/config
+format ${path}/test
