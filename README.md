@@ -17,3 +17,6 @@
 * 目前组件包是经过自己手动处理，暂不支持开源包
 * 目前一键部署只支持单机版，不支持集群
 * 支持安装java，scala，mysql，hadoop，hive，计划增加spark，hbase，phoenix，zookeeper，kafka，redis
+
+## v1.1
+* 优化配置文件修改脚本
