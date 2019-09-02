@@ -52,6 +52,10 @@ function get(){
     then
         PROPERTY_VALUE=`awk -F= "{if(\\$1~/^export ${PROPERTY_NAME}$/) print \\$2}" ${FILE_NAME}`
     fi
+    if [[ -z ${PROPERTY_VALUE} ]]
+    then
+        PROPERTY_VALUE=`grep "^${PROPERTY_NAME}" ${FILE_NAME} | awk '{print $2}'`
+    fi
     echo ${PROPERTY_VALUE}
 }
 
@@ -73,6 +77,9 @@ function put(){
         if [[ $4 -eq 1 ]]
         then
             echo "export ${PROPERTY_NAME}=${PROPERTY_VALUE}" >> ${FILE_NAME}
+        elif [[ $4 -eq 2 ]]
+        then
+            echo "${PROPERTY_NAME} ${PROPERTY_VALUE}" >> ${FILE_NAME}
         else
             echo "${PROPERTY_NAME}=${PROPERTY_VALUE}" >> ${FILE_NAME}
         fi
@@ -83,6 +90,9 @@ function put(){
         if [[ $4 -eq 1 ]]
         then
             sed -i "s/^export ${PROPERTY_NAME}=.*/export ${PROPERTY_NAME}=${PROPERTY_VALUE}/g" ${FILE_NAME}
+        elif [[ $4 -eq 2 ]]
+        then
+            sed -i "s/^${PROPERTY_NAME} .*/${PROPERTY_NAME} ${PROPERTY_VALUE}/g" ${FILE_NAME}
         else
             sed -i "s/^${PROPERTY_NAME}=.*/${PROPERTY_NAME}=${PROPERTY_VALUE}/g" ${FILE_NAME}
         fi

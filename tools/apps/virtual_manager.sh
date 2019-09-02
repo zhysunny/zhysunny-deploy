@@ -5,19 +5,13 @@
 # Description : 虚拟机一键配置管理
 
 modifyStaticIP(){
-    echo $#
-    if [[ $# -ne 1 ]]
-    then
-        echo "sh virtual_manager.sh modifyStaticIP <ip>"
-        exit 1
-    fi
     IFCONFIG_FILE="/etc/sysconfig/network-scripts/ifcfg-"`ifconfig|head -1|cut -d ':' -f1`
-    echo $IFCONFIG_FILE
     IFCONFIG_GATEWAY=`${PROPERTIES_CONFIG_TOOLS} get ${LOCAL_CONFIG_VIRTUAL_FILE} "ifconfig.gateway"`
     IFCONFIG_DNS1=`${PROPERTIES_CONFIG_TOOLS} get ${LOCAL_CONFIG_VIRTUAL_FILE} "ifconfig.dns1"`
     IFCONFIG_DNS2=`${PROPERTIES_CONFIG_TOOLS} get ${LOCAL_CONFIG_VIRTUAL_FILE} "ifconfig.dns2"`
     ${PROPERTIES_CONFIG_TOOLS} put ${IFCONFIG_FILE} "BOOTPROTO" "static"
-    ${PROPERTIES_CONFIG_TOOLS} put ${IFCONFIG_FILE} "IPADDR" $1
+    # 静态IP不允许修改
+#    ${PROPERTIES_CONFIG_TOOLS} put ${IFCONFIG_FILE} "IPADDR" $1
     ${PROPERTIES_CONFIG_TOOLS} put ${IFCONFIG_FILE} "NETMASK" "255.255.255.0"
     ${PROPERTIES_CONFIG_TOOLS} put ${IFCONFIG_FILE} "GATEWAY" ${IFCONFIG_GATEWAY}
     ${PROPERTIES_CONFIG_TOOLS} put ${IFCONFIG_FILE} "DNS1" ${IFCONFIG_DNS1}
@@ -44,8 +38,6 @@ closeFirewall(){
     systemctl stop firewalld.service
     systemctl disable firewalld.service
     setenforce 0
-    service NetworkManager stop
-    chkconfig NetworkManager off
     SELINUX_FILE="/etc/selinux/config"
     ${PROPERTIES_CONFIG_TOOLS} put ${SELINUX_FILE} "SELINUX" "disabled"
 }

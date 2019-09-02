@@ -17,6 +17,7 @@
         <!--<copydir src="lib" dest="${build.dir}/${final.name}/lib"></copydir>-->
         <copydir src="test" dest="${build.dir}/${final.name}/test"></copydir>
         <copydir src="tools" dest="${build.dir}/${final.name}/tools"></copydir>
+        <copyfile src="bigdata" dest="${build.dir}/${final.name}/bigdata"></copyfile>
         <copyfile src="README.md" dest="${build.dir}/${final.name}/README.md"></copyfile>
         <copyfile src="zhysunny_service.sh" dest="${build.dir}/${final.name}/zhysunny_service.sh"></copyfile>
         <copyfile src="zhysunny_test.sh" dest="${build.dir}/${final.name}/zhysunny_test.sh"></copyfile>
@@ -29,6 +30,7 @@
                 <include name="${final.name}/*.md"/>
             </tarfileset>
             <tarfileset dir="${build.dir}" filemode="777">
+                <include name="${final.name}/bigdata"/>
                 <include name="${final.name}/*.sh"/>
                 <include name="${final.name}/tools/**"/>
                 <include name="${final.name}/test/**"/>

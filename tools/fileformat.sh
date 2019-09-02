@@ -19,7 +19,6 @@ format(){
         if [[ "$file" == *".sh" ]]
         then
             sed -i 's/\r$//' ${file}
-            sed -i 's/\^M//' ${file}
         fi
     done
 }

@@ -86,7 +86,7 @@ export INSTALL_APPS
 export UNINSTALL_APPS
 
 installVM(){
-    if [[ $# -ne 2 ]]
+    if [[ $# -ne 1 ]]
     then
         Usage
         exit 1
@@ -99,7 +99,7 @@ installVM(){
     step=${step}+1
     ${LOCAL_TOOLS_APPS_PATH}/virtual_manager.sh modifyHostname $1
     echo ""
-    echo "Step $step : 关闭防火墙、selinux、NetworkManager"
+    echo "Step $step : 关闭防火墙、selinux"
     echo ""
     step=${step}+1
     ${LOCAL_TOOLS_APPS_PATH}/virtual_manager.sh closeFirewall
@@ -108,6 +108,7 @@ installVM(){
     echo ""
     step=${step}+1
     ${LOCAL_TOOLS_APPS_PATH}/virtual_manager.sh secretKey
+    # 其他操作
     ${LOCAL_TOOLS_APPS_PATH}/virtual_manager.sh other
 }
 
@@ -156,7 +157,10 @@ install(){
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/mysql_manager.sh install
         step=${step}+1
+    else
+        MYSQL_HOME=`${PROPERTIES_CONFIG_TOOLS} get ${ENVIRONMENT_VARIABLE_FILE} "MYSQL_HOME"`
     fi
+    export MYSQL_HOME
 
     if [[ `contains "hadoop" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
@@ -176,6 +180,27 @@ install(){
         echo "Step $step Start install hive ..."
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/hive_manager.sh install
+        step=${step}+1
+    else
+        HIVE_HOME=`${PROPERTIES_CONFIG_TOOLS} get ${ENVIRONMENT_VARIABLE_FILE} "HIVE_HOME"`
+    fi
+    export HIVE_HOME
+
+    if [[ `contains "zookeeper" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start install zookeeper ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/zookeeper_manager.sh install
+        step=${step}+1
+    fi
+
+    if [[ `contains "redis" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start install redis ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/redis_manager.sh install
         step=${step}+1
     fi
 
@@ -249,6 +274,24 @@ uninstall(){
         echo "Step $step Start uninstall hive ..."
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/hive_manager.sh uninstall
+        step=${step}+1
+    fi
+
+    if [[ `contains "zookeeper" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall zookeeper ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/zookeeper_manager.sh uninstall
+        step=${step}+1
+    fi
+
+    if [[ `contains "redis" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall redis ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/redis_manager.sh uninstall
         step=${step}+1
     fi
 
