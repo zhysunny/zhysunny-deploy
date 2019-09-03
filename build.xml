@@ -50,7 +50,7 @@
         <copyfile src="zhysunny_service.sh" dest="${build.dir}/${final.name}/zhysunny_service.sh"></copyfile>
         <copyfile src="zhysunny_test.sh" dest="${build.dir}/${final.name}/zhysunny_test.sh"></copyfile>
 
-        <tar compression="gzip" longfile="gnu" destfile="${build.dir}/${final.name}-${build.version}.tar.gz">
+        <tar compression="gzip" longfile="gnu" destfile="${build.dir}/${final.name}-${build.version}-all.tar.gz">
             <tarfileset dir="${build.dir}" filemode="644">
                 <include name="${final.name}/config/**"/>
                 <include name="${final.name}/docs/**"/>
