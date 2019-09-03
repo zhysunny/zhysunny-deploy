@@ -26,5 +26,6 @@ format(){
 format ${path}
 format ${path}/tools
 format ${path}/tools/apps
+format ${path}/tools/service
 format ${path}/config
 format ${path}/test

@@ -42,6 +42,7 @@ install(){
 		chown -R mysql:mysql ${installed_file}
 		${installed_file}/scripts/mysql_install_db --user=mysql --defaults-file=${installed_file}/my.cnf --basedir=${installed_file} --datadir=${installed_file}/data >>${LOCAL_LOGS_FILE} 2>&1
 	fi
+	# 设置开机自启动
 	cp ${installed_file}/support-files/mysql.server /etc/init.d/mysqld
 	service mysqld start
 	chkconfig --add mysqld
@@ -77,6 +78,7 @@ uninstall(){
 	if [[ -n "`cat /etc/shadow|grep mysql`" ]]
 	then
 		userdel mysql
+		rm -rf /home/mysql
 	fi
     # mysql用户组是否存在
 	if [[ -n "`cat /etc/group|grep mysql`" ]]

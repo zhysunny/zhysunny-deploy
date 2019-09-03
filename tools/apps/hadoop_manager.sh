@@ -51,7 +51,12 @@ install(){
 
     # 初始化namenode
     ${HADOOP_HOME}/bin/hadoop namenode -format >>${LOCAL_LOGS_FILE} 2>&1
-    ${HADOOP_HOME}/sbin/start-all.sh
+    # 设置开机自启动
+    cp ${LOCAL_TOOLS_SERVICE_PATH}/hadoop.sh /etc/init.d/hadoop
+    ${PROPERTIES_CONFIG_TOOLS} put /etc/init.d/hadoop "ENVIRONMENT" ${ENVIRONMENT_VARIABLE_FILE}
+	service hadoop start
+	chkconfig --add hadoop
+	chkconfig --level 345 hadoop on
 
     [[ $? -ne 0 ]] && exit $?
     ${PROPERTIES_CONFIG_TOOLS} put ${LOCAL_VERSION_FILE} "version.hadoop" ${HADOOP_VERSION}
@@ -62,7 +67,9 @@ install(){
 }
 
 uninstall(){
-    ${HADOOP_HOME}/sbin/stop-all.sh
+    chkconfig --del hadoop
+    service hadoop stop
+    rm -rf /etc/init.d/hadoop
     if [[ -e ${installed_file} ]]
     then
         rm -rf ${installed_file}

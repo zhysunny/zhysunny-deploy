@@ -34,9 +34,12 @@ install(){
     # 增加PATH
     sed -i 's/^export PATH=/export PATH=${ZOOKEEPER_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
     source ${ENVIRONMENT_VARIABLE_FILE}
-    # 启动zookeeper
-    cd ${ZOOKEEPER_HOME}/bin
-    sh zkServer.sh start >> ${LOCAL_LOGS_FILE} 2>&1
+    # 设置开机自启动
+    cp ${LOCAL_TOOLS_SERVICE_PATH}/zookeeper.sh /etc/init.d/zookeeper
+    ${PROPERTIES_CONFIG_TOOLS} put /etc/init.d/zookeeper "ENVIRONMENT" ${ENVIRONMENT_VARIABLE_FILE}
+	service zookeeper start
+	chkconfig --add zookeeper
+	chkconfig --level 345 zookeeper on
 
     [[ $? -ne 0 ]] && exit $?
     ${PROPERTIES_CONFIG_TOOLS} put ${LOCAL_VERSION_FILE} "version.zookeeper" ${ZOOKEEPER_VERSION}
@@ -47,8 +50,9 @@ install(){
 }
 
 uninstall(){
-    cd ${ZOOKEEPER_HOME}/bin
-    sh zkServer.sh stop >> ${LOCAL_LOGS_FILE} 2>&1
+    chkconfig --del zookeeper
+    service zookeeper stop
+    rm -rf /etc/init.d/zookeeper
     if [[ -e ${installed_file} ]]
     then
         rm -rf ${installed_file}

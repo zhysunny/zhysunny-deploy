@@ -15,7 +15,7 @@ JDK_PACKAGE_NAME=${JDK_NAME}-${JDK_VERSION}
 JDK_INSTALL_FILE=${LOCAL_LIB_PATH}/${JDK_NAME}/${JDK_PACKAGE_NAME}.tar.gz
 # 已安装的程序目录
 installed_file=${INSTALL_PATH}/${JDK_PACKAGE_NAME}
-echo ${INSTALL_APPS[*]}
+
 install(){
     if [[ -e ${installed_file} ]]
     then

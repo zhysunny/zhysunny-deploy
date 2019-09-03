@@ -74,7 +74,7 @@ install(){
 }
 
 uninstall(){
-    # 清楚mysql数据库
+    # 删除mysql数据库
     ${MYSQL_HOME}/bin/mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "drop database hive;" >>${LOCAL_LOGS_FILE} 2>&1
     if [[ -e ${installed_file} ]]
     then
@@ -97,6 +97,32 @@ uninstall(){
     fi
 }
 
+prepare(){
+    # 建库、建表、加载数据
+    ${HIVE_HOME}/bin/hive << EOF
+create database if not exists badou;
+create table if not exists badou.aisles(aisle_id string, aisle string)row format delimited fields terminated by ',' stored as textfile;
+create table if not exists badou.departments(department_id string, department string)row format delimited fields terminated by ',' stored as textfile;
+create table if not exists badou.order_products_prior(order_id string, product_id string, add_to_cart_order string, reordered string)row format delimited fields terminated by ',' stored as textfile;
+create table if not exists badou.order_products_train(order_id string, product_id string, add_to_cart_order string, reordered string)row format delimited fields terminated by ',' stored as textfile;
+create table if not exists badou.orders(order_id string, user_id string, eval_set string, order_number string, order_dow string, order_hour_of_day string, days_since_prior_order string)row format delimited fields terminated by ',' stored as textfile;
+create table if not exists badou.products(product_id string, product_name string, aisle_id string, department_id string)row format delimited fields terminated by ',' stored as textfile;
+create table if not exists badou.udata(user_id string, item_id string, rating string, \`timestamp\` string)row format delimited fields terminated by '\t' stored as textfile;
+load data local inpath "${LOCAL_PATH}/data/hive/aisles.csv" into table badou.aisles;
+load data local inpath "${LOCAL_PATH}/data/hive/departments.csv" into table badou.departments;
+load data local inpath "${LOCAL_PATH}/data/hive/order_products_prior.csv" into table badou.order_products_prior;
+load data local inpath "${LOCAL_PATH}/data/hive/order_products_train.csv" into table badou.order_products_train;
+load data local inpath "${LOCAL_PATH}/data/hive/orders.csv" into table badou.orders;
+load data local inpath "${LOCAL_PATH}/data/hive/products.csv" into table badou.products;
+load data local inpath "${LOCAL_PATH}/data/hive/u.data" into table badou.udata;
+EOF
+}
+
+clean(){
+    # 删除数据库，cascade表示如果有表存在先删表在删库，不加cascade情况下有表的数据库不能删除
+    ${HIVE_HOME}/bin/hive -S -e "drop database if exists badou cascade;"
+}
+
 COMMAND=$1
 
 #参数位置左移1
@@ -108,6 +134,12 @@ case ${COMMAND} in
         ;;
     uninstall )
 		uninstall $*
+		;;
+    prepare )
+		prepare $*
+		;;
+	clean )
+		clean $*
 		;;
     * )
 		Usage

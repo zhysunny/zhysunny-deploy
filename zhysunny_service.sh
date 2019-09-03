@@ -34,6 +34,8 @@ LOCAL_LIB_PATH=${LOCAL_PATH}/lib
 LOCAL_TOOLS_PATH=${LOCAL_PATH}/tools
 # tools/apps目录，独立应用程序的操作脚本
 LOCAL_TOOLS_APPS_PATH=${LOCAL_TOOLS_PATH}/apps
+# tools/service目录，开机自启动服务脚本
+LOCAL_TOOLS_SERVICE_PATH=${LOCAL_TOOLS_PATH}/service
 # 安装目录
 INSTALL_PATH=`awk -F= '{if($1~/^bigdata.install.home$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
 if [[ ! -e ${INSTALL_PATH} ]]
@@ -50,6 +52,7 @@ fi
 LOCAL_LOGS_FILE=${LOCAL_LOGS_PATH}/zhysunny-deploy-$(date +%Y-%m-%d).log
 # 环境变量配置文件
 ENVIRONMENT_VARIABLE_FILE=`awk -F= '{if($1~/^environment.variable.file$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
+source ${ENVIRONMENT_VARIABLE_FILE}
 # 版本信息文件，显示安装的版本号
 LOCAL_VERSION_FILE=${LOCAL_PATH}/version.info
 DEPLOY_VERSION=`awk -F= '{if($1~/^version.deploy$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
@@ -68,6 +71,7 @@ export LOCAL_CONFIG_VIRTUAL_FILE
 export LOCAL_LIB_PATH
 export LOCAL_TOOLS_PATH
 export LOCAL_TOOLS_APPS_PATH
+export LOCAL_TOOLS_SERVICE_PATH
 export INSTALL_PATH
 export LOCAL_LOGS_FILE
 export ENVIRONMENT_VARIABLE_FILE
@@ -133,10 +137,7 @@ install(){
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/jdk_manager.sh install
         step=${step}+1
-    else
-        JAVA_HOME=`${PROPERTIES_CONFIG_TOOLS} get ${ENVIRONMENT_VARIABLE_FILE} "JAVA_HOME"`
     fi
-    export JAVA_HOME
 
     if [[ `contains "scala" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
@@ -145,10 +146,7 @@ install(){
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/scala_manager.sh install
         step=${step}+1
-    else
-        SCALA_HOME=`${PROPERTIES_CONFIG_TOOLS} get ${ENVIRONMENT_VARIABLE_FILE} "SCALA_HOME"`
     fi
-    export SCALA_HOME
 
     if [[ `contains "mysql" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
@@ -157,10 +155,7 @@ install(){
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/mysql_manager.sh install
         step=${step}+1
-    else
-        MYSQL_HOME=`${PROPERTIES_CONFIG_TOOLS} get ${ENVIRONMENT_VARIABLE_FILE} "MYSQL_HOME"`
     fi
-    export MYSQL_HOME
 
     if [[ `contains "hadoop" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
@@ -169,10 +164,7 @@ install(){
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/hadoop_manager.sh install
         step=${step}+1
-    else
-        HADOOP_HOME=`${PROPERTIES_CONFIG_TOOLS} get ${ENVIRONMENT_VARIABLE_FILE} "HADOOP_HOME"`
     fi
-    export HADOOP_HOME
 
     if [[ `contains "hive" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
@@ -181,10 +173,7 @@ install(){
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/hive_manager.sh install
         step=${step}+1
-    else
-        HIVE_HOME=`${PROPERTIES_CONFIG_TOOLS} get ${ENVIRONMENT_VARIABLE_FILE} "HIVE_HOME"`
     fi
-    export HIVE_HOME
 
     if [[ `contains "zookeeper" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
@@ -209,7 +198,15 @@ install(){
 }
 
 prepare(){
-    echo ""
+    getApps $*
+    if [[ `contains "hive" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start prepare hive ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/hive_manager.sh prepare
+        step=${step}+1
+    fi
 }
 
 start(){
@@ -225,12 +222,19 @@ restart(){
 }
 
 clean(){
-    echo ""
+    getApps $*
+    if [[ `contains "hive" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start clean hive ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/hive_manager.sh clean
+        step=${step}+1
+    fi
 }
 
 uninstall(){
     getApps $*
-    source ${ENVIRONMENT_VARIABLE_FILE}
 
     if [[ `contains "jdk" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
