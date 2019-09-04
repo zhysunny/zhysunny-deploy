@@ -28,7 +28,7 @@ get(){
     declare -i NAME_LINE
     declare -i VALUE_LINE
     # 找到 $PROPERTY_NAME 对应的行号
-	NAME_LINE=`grep -n "<name>${PROPERTY_NAME}" ${FILE_NAME} | head -1 | cut -d ":" -f 1`
+	NAME_LINE=`grep -n "<name>${PROPERTY_NAME}</name>" ${FILE_NAME} | head -1 | cut -d ":" -f 1`
 	# $PROPERTY_NAME 行号+1 为value的行号
 	VALUE_LINE=`awk "BEGIN{a=${NAME_LINE};b="1";c=(a+b);print c}"`
     # 获取 value 标签的值
@@ -52,13 +52,35 @@ put(){
     declare -i NAME_LINE
     declare -i VALUE_LINE
     # 找到 $PROPERTY_NAME 对应的行号
-	NAME_LINE=`grep -n "<name>${PROPERTY_NAME}" ${FILE_NAME} | head -1 | cut -d ":" -f 1`
-	# $PROPERTY_NAME 行号+1 为value的行号
-	VALUE_LINE=`awk "BEGIN{a=${NAME_LINE};b="1";c=(a+b);print c}"`
+	NAME_LINE=`grep -n "<name>${PROPERTY_NAME}</name>" ${FILE_NAME} | head -1 | cut -d ":" -f 1`
+	# 如果不存在行号，增加一个配置项
+	if [[ ${NAME_LINE} -eq 0 ]]
+	then
+        add ${FILE_NAME} ${PROPERTY_NAME} ${PROPERTY_VALUE}
+    else
+        # 如果存在行号，修改配置值
+        # $PROPERTY_NAME 行号+1 为value的行号
+        VALUE_LINE=`awk "BEGIN{a=${NAME_LINE};b="1";c=(a+b);print c}"`
+        # 修改 value 标签的值
+        PROPERTY_VALUE=`echo ${PROPERTY_VALUE} | sed 's#\/#\\\/#g'`
+        sed -i "${VALUE_LINE}s/.*/\t<value>${PROPERTY_VALUE}<\/value>/g" ${FILE_NAME}
+        echo "modify $FILE_NAME $PROPERTY_NAME=$PROPERTY_VALUE successful !!"
+	fi
+}
+
+add(){
+    # 防止添加相同配置项，这个命令不对外开放
+    FILE_NAME=$1
+    PROPERTY_NAME=$2
+    PROPERTY_VALUE=$3
+    declare -i ROOT_LINE
+    declare -i VALUE_LINE
+    # 找到 </configuration> 对应的行号,在前一行增加数据
+	ROOT_LINE=`grep -n "^</configuration>" ${FILE_NAME} | head -1 | cut -d ":" -f 1`
     # 修改 value 标签的值
     PROPERTY_VALUE=`echo ${PROPERTY_VALUE} | sed 's#\/#\\\/#g'`
-    sed -i "${VALUE_LINE}s/.*/\t<value>${PROPERTY_VALUE}<\/value>/g" ${FILE_NAME}
-    echo "modify $FILE_NAME $PROPERTY_NAME=$PROPERTY_VALUE successful !!"
+    sed -i "${ROOT_LINE}i\    <property>\n        <name>${PROPERTY_NAME}</name>\n        <value>${PROPERTY_VALUE}</value>\n    </property>" ${FILE_NAME}
+    echo "add $FILE_NAME $PROPERTY_NAME=$PROPERTY_VALUE successful !!"
 }
 
 COMMAND=$1
