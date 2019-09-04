@@ -16,7 +16,7 @@ format(){
     for f in ${files[*]}
     do
         file=${dir}/${f}
-        if [[ "$file" == *".sh" ]]
+        if [[ "$file" == *".sh" -o "$file" == *".properties" ]]
         then
             sed -i 's/\r$//' ${file}
         fi
