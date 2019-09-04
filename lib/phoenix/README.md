@@ -1,2 +1,2 @@
 phoenix 安装包
-phoenix-${version}.tar.gz
+apache-phoenix-${version}.tar.gz

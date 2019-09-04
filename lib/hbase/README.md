@@ -1,2 +1,2 @@
 hbase 安装包
-hbase-${version}.tar.gz
+hbase-${version}-bin.tar.gz
