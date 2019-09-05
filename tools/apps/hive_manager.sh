@@ -5,7 +5,7 @@
 
 Usage()
 {
-    echo "Usage: sh hive_manager.sh install | uninstall"
+    echo "Usage: sh hive_manager.sh (install | uninstall | prepare | clean)"
     exit 1
 }
 

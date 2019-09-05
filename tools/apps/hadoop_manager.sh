@@ -21,7 +21,7 @@ install(){
     then
         rm -rf ${installed_file}
     fi
-    tar -xvf ${HADOOP_INSTALL_FILE} -C ${INSTALL_PATH} >>${LOCAL_LOGS_FILE} 2>&1
+    tar -xvf ${HADOOP_INSTALL_FILE} -C ${INSTALL_PATH} >> ${LOCAL_LOGS_FILE} 2>&1
     # 修改环境变量
     HADOOP_HOME=${installed_file}
     ${PROPERTIES_CONFIG_TOOLS} put ${ENVIRONMENT_VARIABLE_FILE} "HADOOP_HOME" ${HADOOP_HOME} 1
@@ -35,17 +35,24 @@ install(){
     HDFS_REPLICATION=`awk -F= '{if($1~/^hdfs.replication$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
     # 目前只做单机版
     echo ${hostname} > $HADOOP_CONFIG_PATH/slaves
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/core-site.xml hadoop.tmp.dir "file:${HADOOP_HOME}/tmp"
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/core-site.xml fs.default.name "hdfs://${hostname}:8020"
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml dfs.namenode.secondary.http-address ${hostname}:9001
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml dfs.namenode.name.dir "file:${HADOOP_HOME}/dfs/name"
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml dfs.namenode.data.dir "file:${HADOOP_HOME}/dfs/data"
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml hdfs.replication ${HDFS_REPLICATION}
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml yarn.resourcemanager.address ${hostname}:8032
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml yarn.resourcemanager.scheduler.address ${hostname}:8030
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml yarn.resourcemanager.resource-tracker.address ${hostname}:8035
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml yarn.resourcemanager.admin.address ${hostname}:8033
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml yarn.resourcemanager.webapp.address ${hostname}:8088
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/core-site.xml "hadoop.tmp.dir" "file:${HADOOP_HOME}/tmp"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/core-site.xml "fs.default.name" "hdfs://${hostname}:8020"
+
+    cp ${HADOOP_CONFIG_PATH}/mapred-site.xml.template ${HADOOP_CONFIG_PATH}/mapred-site.xml
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/mapred-site.xml "mapreduce.framework.name" "yarn"
+
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml "dfs.namenode.secondary.http-address" "${hostname}:9001"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml "dfs.namenode.name.dir" "file:${HADOOP_HOME}/dfs/name"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml "dfs.namenode.data.dir" "file:${HADOOP_HOME}/dfs/data"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml "hdfs.replication" "${HDFS_REPLICATION}"
+
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml "yarn.nodemanager.aux-services" "mapreduce_shuffle"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml "yarn.nodemanager.aux-services.mapreduce.shuffle.class" "org.apache.hadoop.mapred.ShuffleHandler"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml "yarn.resourcemanager.address" "${hostname}:8032"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml "yarn.resourcemanager.scheduler.address" "${hostname}:8030"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml "yarn.resourcemanager.resource-tracker.address" "${hostname}:8035"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml "yarn.resourcemanager.admin.address" "${hostname}:8033"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml "yarn.resourcemanager.webapp.address" "${hostname}:8088"
     ${PROPERTIES_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hadoop-env.sh "JAVA_HOME" ${JAVA_HOME} 1
     ${PROPERTIES_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-env.sh "JAVA_HOME" ${JAVA_HOME} 1
 
