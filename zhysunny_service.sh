@@ -157,6 +157,15 @@ install(){
         step=${step}+1
     fi
 
+    if [[ `contains "redis" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start install redis ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/redis_manager.sh install
+        step=${step}+1
+    fi
+
     if [[ `contains "hadoop" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
         echo ""
@@ -184,12 +193,12 @@ install(){
         step=${step}+1
     fi
 
-    if [[ `contains "redis" ${INSTALL_APPS[*]}` -eq 0 ]]
+    if [[ `contains "hbase" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
         echo ""
-        echo "Step $step Start install redis ..."
+        echo "Step $step Start install hbase ..."
         echo ""
-        ${LOCAL_TOOLS_APPS_PATH}/redis_manager.sh install
+        ${LOCAL_TOOLS_APPS_PATH}/hbase_manager.sh install
         step=${step}+1
     fi
 
@@ -263,6 +272,15 @@ uninstall(){
         step=${step}+1
     fi
 
+    if [[ `contains "redis" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall redis ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/redis_manager.sh uninstall
+        step=${step}+1
+    fi
+
     if [[ `contains "hadoop" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
         echo ""
@@ -290,12 +308,12 @@ uninstall(){
         step=${step}+1
     fi
 
-    if [[ `contains "redis" ${INSTALL_APPS[*]}` -eq 0 ]]
+    if [[ `contains "hbase" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
         echo ""
-        echo "Step $step Start uninstall redis ..."
+        echo "Step $step Start uninstall hbase ..."
         echo ""
-        ${LOCAL_TOOLS_APPS_PATH}/redis_manager.sh uninstall
+        ${LOCAL_TOOLS_APPS_PATH}/hbase_manager.sh uninstall
         step=${step}+1
     fi
 

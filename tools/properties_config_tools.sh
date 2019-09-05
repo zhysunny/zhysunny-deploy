@@ -24,7 +24,7 @@ function grepCount(){
     # 这里的PROPERTY_NAME是一行中的关键词，不一定是key值，必须是文件中唯一，否则会出现错误
     PROPERTY_NAME=$2
     declare -a result
-    result=(`cat ${FILE_NAME} | grep ${PROPERTY_NAME}`)
+    result=(`cat ${FILE_NAME} | grep ${PROPERTY_NAME} | grep -v "^#"`)
     echo ${#result[*]}
 }
 
@@ -71,6 +71,9 @@ function put(){
     PROPERTY_NAME=$2
     PROPERTY_VALUE=$3
     count=`grepCount ${FILE_NAME} ${PROPERTY_NAME}`
+    # $4 = 1 表示设置环境变量，需要加export
+    # $4 = 2 表示设置变量为key value，中间是空格不是等于号
+    # 其他情况下默认就是key=value的形式
     if [[ ${count} -eq 0 ]]
     then
         # 没找到则添加
@@ -85,7 +88,6 @@ function put(){
         fi
         echo "add $FILE_NAME $PROPERTY_NAME=$PROPERTY_VALUE successful !!"
     else
-        # 找到多个异常退出
         PROPERTY_VALUE=`echo ${PROPERTY_VALUE} | sed 's#\/#\\\/#g'`
         if [[ $4 -eq 1 ]]
         then
