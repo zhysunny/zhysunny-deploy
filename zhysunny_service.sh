@@ -202,6 +202,15 @@ install(){
         step=${step}+1
     fi
 
+    if [[ `contains "phoenix" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start install phoenix ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/phoenix_manager.sh install
+        step=${step}+1
+    fi
+
     if [[ `contains "spark" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
         echo ""
@@ -332,6 +341,15 @@ uninstall(){
         echo "Step $step Start uninstall hbase ..."
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/hbase_manager.sh uninstall
+        step=${step}+1
+    fi
+
+    if [[ `contains "phoenix" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall phoenix ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/phoenix_manager.sh uninstall
         step=${step}+1
     fi
 

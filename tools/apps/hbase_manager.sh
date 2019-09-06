@@ -34,7 +34,7 @@ install(){
     hostname=`hostname`
     # 目前只做单机版
     echo ${hostname} > $HBASE_CONFIG_PATH/regionservers
-    ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "hbase.tmp.dir" "file:${HBASE_HOME}/tmp"
+    ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "hbase.tmp.dir" "file://${HBASE_HOME}/tmp"
     ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "hbase.rootdir" "hdfs://${hostname}:8020/hbase"
     ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "hbase.cluster.distributed" "true"
     ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "hbase.zookeeper.quorum" "${hostname}"

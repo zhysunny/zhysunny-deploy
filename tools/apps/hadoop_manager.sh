@@ -35,15 +35,15 @@ install(){
     HDFS_REPLICATION=`awk -F= '{if($1~/^hdfs.replication$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
     # 目前只做单机版
     echo ${hostname} > $HADOOP_CONFIG_PATH/slaves
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/core-site.xml "hadoop.tmp.dir" "file:${HADOOP_HOME}/tmp"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/core-site.xml "hadoop.tmp.dir" "file://${HADOOP_HOME}/tmp"
     ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/core-site.xml "fs.default.name" "hdfs://${hostname}:8020"
 
     cp ${HADOOP_CONFIG_PATH}/mapred-site.xml.template ${HADOOP_CONFIG_PATH}/mapred-site.xml
     ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/mapred-site.xml "mapreduce.framework.name" "yarn"
 
     ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml "dfs.namenode.secondary.http-address" "${hostname}:9001"
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml "dfs.namenode.name.dir" "file:${HADOOP_HOME}/dfs/name"
-    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml "dfs.namenode.data.dir" "file:${HADOOP_HOME}/dfs/data"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml "dfs.namenode.name.dir" "file://${HADOOP_HOME}/dfs/name"
+    ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml "dfs.namenode.data.dir" "file://${HADOOP_HOME}/dfs/data"
     ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/hdfs-site.xml "hdfs.replication" "${HDFS_REPLICATION}"
 
     ${XML_CONFIG_TOOLS} put ${HADOOP_CONFIG_PATH}/yarn-site.xml "yarn.nodemanager.aux-services" "mapreduce_shuffle"
