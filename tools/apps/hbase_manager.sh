@@ -32,7 +32,6 @@ install(){
     # 修改配置
     HBASE_CONFIG_PATH=${HBASE_HOME}/conf
     hostname=`hostname`
-    HDFS_REPLICATION=`awk -F= '{if($1~/^hdfs.replication$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
     # 目前只做单机版
     echo ${hostname} > $HBASE_CONFIG_PATH/regionservers
     ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "hbase.tmp.dir" "file:${HBASE_HOME}/tmp"

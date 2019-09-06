@@ -32,7 +32,6 @@ install(){
 
     SPARK_CONFIG_PATH=${SPARK_HOME}/conf
     hostname=`hostname`
-    HDFS_REPLICATION=`awk -F= '{if($1~/^hdfs.replication$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
     # 目前只做单机版
     echo ${hostname} > ${SPARK_CONFIG_PATH}/slaves
     cp ${SPARK_CONFIG_PATH}/spark-env.sh.template ${SPARK_CONFIG_PATH}/spark-env.sh

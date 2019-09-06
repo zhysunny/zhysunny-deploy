@@ -211,6 +211,15 @@ install(){
         step=${step}+1
     fi
 
+    if [[ `contains "kafka" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start install kafka ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/kafka_manager.sh install
+        step=${step}+1
+    fi
+
     # 安装版本信息
     [[ $? -ne 0 ]] && exit $?
 }
@@ -332,6 +341,15 @@ uninstall(){
         echo "Step $step Start uninstall spark ..."
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/spark_manager.sh uninstall
+        step=${step}+1
+    fi
+
+    if [[ `contains "kafka" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall kafka ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/kafka_manager.sh uninstall
         step=${step}+1
     fi
 
