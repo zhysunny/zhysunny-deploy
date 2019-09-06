@@ -60,7 +60,7 @@ install(){
     ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "javax.jdo.option.ConnectionUserName" "root"
     ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "javax.jdo.option.ConnectionPassword" "${MYSQL_ROOT_PASSWORD}"
     # hiveserver2配置
-#    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.server2.thrift.bind.host" "${hostname}"
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.server2.thrift.bind.host" "${hostname}"
     # 其他配置
     ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.cli.print.header" "true"
     ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.enforce.bucketing" "true"
