@@ -9,6 +9,7 @@ Usage()
     echo "Usage: "
     echo "sh xml_config_tools.sh get <fileName> <propertyName>"
     echo "sh xml_config_tools.sh put <fileName> <propertyName> <propertyValue>"
+    echo "sh xml_config_tools.sh createXmlFile <fileName>"
     exit 1
 }
 
@@ -83,6 +84,24 @@ add(){
     echo "add $FILE_NAME $PROPERTY_NAME=$PROPERTY_VALUE successful !!"
 }
 
+createXmlFile(){
+    if [[ $# -ne 1 ]]
+    then
+        Usage
+        exit 1
+    fi
+    FILE_NAME=$1
+    if [[ -e ${FILE_NAME} ]]
+    then
+        echo "${FILE_NAME}文件已存在"
+    else
+        touch ${FILE_NAME}
+        echo "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" > ${FILE_NAME}
+        echo "<configuration>" >> ${FILE_NAME}
+        echo "</configuration>" >> ${FILE_NAME}
+    fi
+}
+
 COMMAND=$1
 #参数位置左移1
 shift
@@ -93,6 +112,9 @@ case ${COMMAND} in
         ;;
     put )
         put $*
+        ;;
+    createXmlFile )
+        createXmlFile $*
         ;;
     * )
 		Usage

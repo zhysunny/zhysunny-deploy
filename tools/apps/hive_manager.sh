@@ -12,9 +12,10 @@ Usage()
 HIVE_VERSION=`awk -F= '{if($1~/^version.hive$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
 HIVE_NAME="hive"
 HIVE_PACKAGE_NAME=${HIVE_NAME}-${HIVE_VERSION}
-HIVE_INSTALL_FILE=${LOCAL_LIB_PATH}/${HIVE_NAME}/${HIVE_PACKAGE_NAME}.tar.gz
+HIVE_INSTALL_FILE=${LOCAL_LIB_PATH}/${HIVE_NAME}/apache-${HIVE_PACKAGE_NAME}-bin.tar.gz
 # 已安装的程序目录
 installed_file=${INSTALL_PATH}/${HIVE_PACKAGE_NAME}
+MYSQL_JAR_FILE_NAME=mysql-connector-*.jar
 
 install(){
     source ${ENVIRONMENT_VARIABLE_FILE}
@@ -33,28 +34,37 @@ install(){
         rm -rf ${installed_file}
     fi
     tar -xvf ${HIVE_INSTALL_FILE} -C ${INSTALL_PATH} >>${LOCAL_LOGS_FILE} 2>&1
+    mv ${INSTALL_PATH}/apache-${HIVE_PACKAGE_NAME}-bin ${installed_file}
     # 修改配置
     HIVE_HOME=${installed_file}
     HIVE_CONFIG_PATH=${HIVE_HOME}/conf
     cp ${HIVE_CONFIG_PATH}/hive-default.xml.template ${HIVE_CONFIG_PATH}/hive-default.xml
-    cp ${HIVE_CONFIG_PATH}/hive-default.xml.template ${HIVE_CONFIG_PATH}/hive-site.xml
+    ${XML_CONFIG_TOOLS} createXmlFile ${HIVE_CONFIG_PATH}/hive-site.xml
     rm -rf ${HADOOP_HOME}/share/hadoop/yarn/lib/jline*.jar
     cp ${HIVE_HOME}/lib/jline*.jar ${HADOOP_HOME}/share/hadoop/yarn/lib
+    rm -rf ${HIVE_HOME}/lib/${MYSQL_JAR_FILE_NAME}
+    cp ${LOCAL_LIB_PATH}/jars/${MYSQL_JAR_FILE_NAME} ${HIVE_HOME}/lib/
     # 修改xml配置
     hostname=`hostname`
     HIVE_TEMP_PATH="${HIVE_HOME}/tmp"
-    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml hive.exec.scratchdir "${HIVE_TEMP_PATH}/hive"
-    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml hive.hbase.snapshot.restoredir ${HIVE_TEMP_PATH}
-    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml hive.exec.local.scratchdir ${HIVE_TEMP_PATH}
-    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml hive.downloaded.resources.dir "${HIVE_TEMP_PATH}/\${hive.session.id}_resources"
-    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml hive.querylog.location ${HIVE_TEMP_PATH}
-    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml hive.server2.logging.operation.log.location "${HIVE_TEMP_PATH}/operation_logs"
-    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml javax.jdo.option.ConnectionDriverName com.mysql.jdbc.Driver
-    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml javax.jdo.option.ConnectionURL "jdbc:mysql://${hostname}:3306/hive?createDatabaseIfNotExist=true"
-    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml javax.jdo.option.ConnectionUserName root
-    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml javax.jdo.option.ConnectionPassword ${MYSQL_ROOT_PASSWORD}
-    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml hive.cli.print.header true
-    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml hive.enforce.bucketing true
+    # 必须修改的配置，否则报错
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.exec.scratchdir" "${HIVE_TEMP_PATH}/hive"
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.hbase.snapshot.restoredir" "${HIVE_TEMP_PATH}"
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.exec.local.scratchdir" "${HIVE_TEMP_PATH}"
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.downloaded.resources.dir" "${HIVE_TEMP_PATH}/\${hive.session.id}_resources"
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.querylog.location" "${HIVE_TEMP_PATH}"
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.server2.logging.operation.log.location" "${HIVE_TEMP_PATH}/operation_logs"
+    # 数据库配置
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "javax.jdo.option.ConnectionDriverName" "com.mysql.jdbc.Driver"
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "javax.jdo.option.ConnectionURL" "jdbc:mysql://${hostname}:3306/hive?createDatabaseIfNotExist=true"
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "javax.jdo.option.ConnectionUserName" "root"
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "javax.jdo.option.ConnectionPassword" "${MYSQL_ROOT_PASSWORD}"
+    # hiveserver2配置
+#    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.server2.thrift.bind.host" "${hostname}"
+    # 其他配置
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.cli.print.header" "true"
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.enforce.bucketing" "true"
+    ${XML_CONFIG_TOOLS} put ${HIVE_CONFIG_PATH}/hive-site.xml "hive.cli.print.current.db" "true"
     # 创建数据库，并设置编码
     ${MYSQL_HOME}/bin/mysql -uroot -p${MYSQL_ROOT_PASSWORD} -e "create database hive DEFAULT CHARSET latin1;" >>${LOCAL_LOGS_FILE} 2>&1
     # 修改环境变量

@@ -1,2 +1,3 @@
-hive 安装包
-hive-${version}.tar.gz
+### hive 安装包
+
+apache-hive-${version}-bin.tar.gz
