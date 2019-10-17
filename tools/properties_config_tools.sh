@@ -79,7 +79,15 @@ function put(){
         # 没找到则添加
         if [[ $4 -eq 1 ]]
         then
-            echo "export ${PROPERTY_NAME}=${PROPERTY_VALUE}" >> ${FILE_NAME}
+            # 环境变量HOME配置在PATH前面
+            PATH_LINE=`grep -n "^export PATH=" ${FILE_NAME} | head -1 | cut -d ":" -f 1`
+            if [[ -z "${PATH_LINE}" ]]
+            then
+                echo "export ${PROPERTY_NAME}=${PROPERTY_VALUE}" >> ${FILE_NAME}
+            else
+                PATH_LINE=`awk "BEGIN{a=${PATH_LINE};b="1";c=(a-b);print c}"`
+                sed -i "${PATH_LINE}i\export ${PROPERTY_NAME}=${PROPERTY_VALUE}" ${FILE_NAME}
+            fi
         elif [[ $4 -eq 2 ]]
         then
             echo "${PROPERTY_NAME} ${PROPERTY_VALUE}" >> ${FILE_NAME}
