@@ -85,7 +85,6 @@ function put(){
             then
                 echo "export ${PROPERTY_NAME}=${PROPERTY_VALUE}" >> ${FILE_NAME}
             else
-                PATH_LINE=`awk "BEGIN{a=${PATH_LINE};b="1";c=(a-b);print c}"`
                 sed -i "${PATH_LINE}i\export ${PROPERTY_NAME}=${PROPERTY_VALUE}" ${FILE_NAME}
             fi
         elif [[ $4 -eq 2 ]]
