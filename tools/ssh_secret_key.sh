@@ -11,7 +11,7 @@
 Usage()
 {
     echo "Usage: "
-    echo "sh ssh_secret_key_retain.sh <ip_string> <password> <username:root>"
+    echo "sh ssh_secret_key.sh <ip_string> <password> <username:root>"
     echo "多个IP地址以","分隔。可输入ip范围，以"-"分隔。"
     echo "如：192.9.200.164,192.9.200.190-192.9.200.194,192.9.200.198"
     echo "username 用户名 password 用户名对应的密码 username默认是root"
