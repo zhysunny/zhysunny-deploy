@@ -71,3 +71,4 @@ done
 
 rm -rf known_hosts
 
+echo "免秘钥配置完成"
