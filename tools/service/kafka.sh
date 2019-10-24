@@ -16,11 +16,13 @@ source ${ENVIRONMENT}
 start(){
     cd ${KAFKA_HOME}/bin
     sh kafka-server-start.sh -daemon ${KAFKA_HOME}/config/server.properties
+    echo "Start Kafka Server..."
 }
 
 stop(){
     cd ${KAFKA_HOME}/bin
     sh kafka-server-stop.sh
+    echo "Stop Kafka Server..."
 }
 
 restart(){
