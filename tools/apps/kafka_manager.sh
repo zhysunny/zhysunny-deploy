@@ -36,7 +36,7 @@ install(){
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "host.name" "${hostname}"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "delete.topic.enable" "true"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "log.dirs" "${KAFKA_HOME}/logs"
-    ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "meaagse.max.byte" "5242880"
+    ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "message.max.bytes" "5242880"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "replica.fetch.max.bytes" "5242880"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "default.replication.factor" "1"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "zookeeper.connect" "${hostname}:2181"
