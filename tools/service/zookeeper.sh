@@ -1,5 +1,5 @@
 #!/bin/sh
-# chkconfig: 2345 64 36
+# chkconfig: 2345 60 40
 # Author      : 章云
 # Date        : 2019/8/21 8:57
 # Description : 开机自启动脚本，适用于单机版，集群版由于启动时间不一致会导致组件启动失败
