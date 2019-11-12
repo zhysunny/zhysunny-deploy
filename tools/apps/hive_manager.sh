@@ -120,7 +120,10 @@ create table if not exists badou.orders(order_id string, user_id string, eval_se
 create table if not exists badou.products(product_id string, product_name string, aisle_id string, department_id string)row format delimited fields terminated by ',' stored as textfile;
 create table if not exists badou.udata(user_id string, item_id string, rating string, \`timestamp\` string)row format delimited fields terminated by '\t' stored as textfile;
 create database if not exists test;
-create table if not exists test.test(name string, age int, gender int)row format delimited fields terminated by ',' stored as textfile;
+create table if not exists test.course(cid string, name string, tid string)row format delimited fields terminated by '\t' stored as textfile;
+create table if not exists test.score(sid string, cid string, score int)row format delimited fields terminated by '\t' stored as textfile;
+create table if not exists test.student(sid string, name string, birth string, gender int)row format delimited fields terminated by '\t' stored as textfile;
+create table if not exists test.teacher(tid string, name string)row format delimited fields terminated by '\t' stored as textfile;
 load data local inpath "${LOCAL_PATH}/data/hive/aisles.csv" into table badou.aisles;
 load data local inpath "${LOCAL_PATH}/data/hive/departments.csv" into table badou.departments;
 load data local inpath "${LOCAL_PATH}/data/hive/order_products_prior.csv" into table badou.order_products_prior;
@@ -128,7 +131,10 @@ load data local inpath "${LOCAL_PATH}/data/hive/order_products_train.csv" into t
 load data local inpath "${LOCAL_PATH}/data/hive/orders.csv" into table badou.orders;
 load data local inpath "${LOCAL_PATH}/data/hive/products.csv" into table badou.products;
 load data local inpath "${LOCAL_PATH}/data/hive/u.data" into table badou.udata;
-load data local inpath "${LOCAL_PATH}/data/hive/test.data" into table test.test;
+load data local inpath "${LOCAL_PATH}/data/hive/course.txt" into table test.course;
+load data local inpath "${LOCAL_PATH}/data/hive/score.txt" into table test.score;
+load data local inpath "${LOCAL_PATH}/data/hive/student.txt" into table test.student;
+load data local inpath "${LOCAL_PATH}/data/hive/teacher.txt" into table test.teacher;
 EOF
 }
 
