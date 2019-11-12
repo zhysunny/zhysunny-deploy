@@ -19,7 +19,8 @@ echo ${INSTALL_APPS[*]}
 install(){
     if [[ -e ${installed_file} ]]
     then
-        rm -rf ${installed_file}
+        echo "zookeeper已安装"
+        exit 1
     fi
     tar -xvf ${ZOOKEEPER_INSTALL_FILE} -C ${INSTALL_PATH} >> ${LOCAL_LOGS_FILE} 2>&1
     # 修改配置

@@ -19,7 +19,8 @@ installed_file=${INSTALL_PATH}/${REDIS_PACKAGE_NAME}
 install(){
     if [[ -e ${installed_file} ]]
     then
-        rm -rf ${installed_file}
+        echo "redis已安装"
+        exit 1
     fi
     tar -xvf ${REDIS_INSTALL_FILE} -C ${INSTALL_PATH} >>${LOCAL_LOGS_FILE} 2>&1
     # 编译

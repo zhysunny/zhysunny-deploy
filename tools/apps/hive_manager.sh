@@ -31,7 +31,8 @@ install(){
     fi
     if [[ -e ${installed_file} ]]
     then
-        rm -rf ${installed_file}
+        echo "hive已安装"
+        exit 1
     fi
     tar -xvf ${HIVE_INSTALL_FILE} -C ${INSTALL_PATH} >>${LOCAL_LOGS_FILE} 2>&1
     mv ${INSTALL_PATH}/apache-${HIVE_PACKAGE_NAME}-bin ${installed_file}
@@ -111,6 +112,7 @@ prepare(){
     # 建库、建表、加载数据
     ${HIVE_HOME}/bin/hive << EOF
 create database if not exists badou;
+create database if not exists test;
 create table if not exists badou.aisles(aisle_id string, aisle string)row format delimited fields terminated by ',' stored as textfile;
 create table if not exists badou.departments(department_id string, department string)row format delimited fields terminated by ',' stored as textfile;
 create table if not exists badou.order_products_prior(order_id string, product_id string, add_to_cart_order string, reordered string)row format delimited fields terminated by ',' stored as textfile;
@@ -131,6 +133,7 @@ EOF
 clean(){
     # 删除数据库，cascade表示如果有表存在先删表在删库，不加cascade情况下有表的数据库不能删除
     ${HIVE_HOME}/bin/hive -S -e "drop database if exists badou cascade;"
+    ${HIVE_HOME}/bin/hive -S -e "drop database if exists test cascade;"
 }
 
 COMMAND=$1

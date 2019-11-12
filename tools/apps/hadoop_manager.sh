@@ -19,7 +19,8 @@ installed_file=${INSTALL_PATH}/${HADOOP_PACKAGE_NAME}
 install(){
     if [[ -e ${installed_file} ]]
     then
-        rm -rf ${installed_file}
+        echo "hadoop已安装"
+        exit 1
     fi
     tar -xvf ${HADOOP_INSTALL_FILE} -C ${INSTALL_PATH} >> ${LOCAL_LOGS_FILE} 2>&1
     # 修改环境变量

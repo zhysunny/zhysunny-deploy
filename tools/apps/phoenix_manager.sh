@@ -26,7 +26,8 @@ install(){
     fi
     if [[ -e ${installed_file} ]]
     then
-        rm -rf ${installed_file}
+        echo "phoenix已安装"
+        exit 1
     fi
     tar -xvf ${PHOENIX_INSTALL_FILE} -C ${INSTALL_PATH} >>${LOCAL_LOGS_FILE} 2>&1
     mv ${INSTALL_PATH}/apache-${PHOENIX_PACKAGE_NAME}-bin ${installed_file}
