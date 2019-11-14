@@ -73,6 +73,10 @@ install(){
     # 增加PATH
     sed -i 's/^export PATH=/export PATH=${HIVE_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
     source ${ENVIRONMENT_VARIABLE_FILE}
+    # 增加udf
+    HIVE_AUXLIB_PATH="${HIVE_HOME}/auxlib"
+    mkdir -p ${HIVE_AUXLIB_PATH}
+    cp ${LOCAL_TOOLS_PATH}/lib/zhysunny-hive-1.1.jar ${HIVE_AUXLIB_PATH}
     [[ $? -ne 0 ]] && exit $?
     ${PROPERTIES_CONFIG_TOOLS} put ${LOCAL_VERSION_FILE} "version.hive" ${HIVE_VERSION}
     echo ""
@@ -109,7 +113,7 @@ uninstall(){
 }
 
 prepare(){
-    # 建库、建表、加载数据
+    # 建库、建表、加载数据，加载udf
     ${HIVE_HOME}/bin/hive << EOF
 create database if not exists badou;
 create table if not exists badou.aisles(aisle_id string, aisle string)row format delimited fields terminated by ',' stored as textfile;
@@ -135,6 +139,8 @@ load data local inpath "${LOCAL_PATH}/data/hive/course.txt" into table test.cour
 load data local inpath "${LOCAL_PATH}/data/hive/score.txt" into table test.score;
 load data local inpath "${LOCAL_PATH}/data/hive/student.txt" into table test.student;
 load data local inpath "${LOCAL_PATH}/data/hive/teacher.txt" into table test.teacher;
+create function to_age as 'com.zhysunny.hive.udf.BirthToAge';
+create function avg_age as 'com.zhysunny.hive.udaf.AvgBirthToAge';
 EOF
 }
 
