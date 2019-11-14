@@ -146,8 +146,12 @@ EOF
 
 clean(){
     # 删除数据库，cascade表示如果有表存在先删表在删库，不加cascade情况下有表的数据库不能删除
-    ${HIVE_HOME}/bin/hive -S -e "drop database if exists badou cascade;"
-    ${HIVE_HOME}/bin/hive -S -e "drop database if exists test cascade;"
+    ${HIVE_HOME}/bin/hive << EOF
+drop database if exists badou cascade;
+drop database if exists test cascade;
+drop function to_age;
+drop function avg_age;
+EOF
 }
 
 COMMAND=$1
