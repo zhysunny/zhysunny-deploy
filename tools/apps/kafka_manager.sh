@@ -34,6 +34,7 @@ install(){
     hostname=`hostname`
     # 目前只做单机版
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "broker.id" "0"
+    ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "listeners" "PLAINTEXT://${hostname}:9092"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "host.name" "${hostname}"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "delete.topic.enable" "true"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "log.dirs" "${KAFKA_HOME}/logs"
