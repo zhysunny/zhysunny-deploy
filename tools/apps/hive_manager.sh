@@ -77,7 +77,11 @@ install(){
     HIVE_AUXLIB_PATH="${HIVE_HOME}/auxlib"
     mkdir -p ${HIVE_AUXLIB_PATH}
     cp ${LOCAL_TOOLS_PATH}/lib/zhysunny-hive-1.1.jar ${HIVE_AUXLIB_PATH}
-    [[ $? -ne 0 ]] && exit $?
+    # 修改日志配置
+    HIVE_LOG4J_FILE="${HIVE_HOME}/conf/hive-log4j.properties"
+    cp ${HIVE_LOG4J_FILE}.template ${HIVE_LOG4J_FILE}
+    ${XML_CONFIG_TOOLS} put ${HIVE_LOG4J_FILE} "hive.log.dir" "${HIVE_HOME}/logs"
+
     ${PROPERTIES_CONFIG_TOOLS} put ${LOCAL_VERSION_FILE} "version.hive" ${HIVE_VERSION}
     echo ""
     echo "Install hive successfully!!!"
