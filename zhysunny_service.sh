@@ -6,15 +6,14 @@
 Usage()
 {
     echo "Usage："
-	echo "sh zhysunny_service.sh installVM <hostname>"
-	echo "sh zhysunny_service.sh getApps [apps]?"
-	echo "sh zhysunny_service.sh install [apps]?"
-	echo "sh zhysunny_service.sh uninstall [apps]?"
-	echo "sh zhysunny_service.sh prepare | install :   prepareOnlyCloudera & prepareOnlyES [--mysqlhost=] "
-	echo "sh zhysunny_service.sh start             :   startOnlyCloudera & startOnlyES  "
-	echo "sh zhysunny_service.sh stop              :   stopOnlyCloudera & stopOnlyES  "
-	echo "sh zhysunny_service.sh restart           :   restartOnlyCloudera & restartOnlyES  "
-	echo "sh zhysunny_service.sh clean | uninstall :   cleanOnlyCloudera & cleanOnlyES  "
+	echo "sh zhysunny_service.sh getApps [apps]*"
+	echo "sh zhysunny_service.sh install [apps]*"
+	echo "sh zhysunny_service.sh uninstall [apps]*"
+	echo "sh zhysunny_service.sh prepare"
+	echo "sh zhysunny_service.sh start"
+	echo "sh zhysunny_service.sh stop"
+	echo "sh zhysunny_service.sh restart"
+	echo "sh zhysunny_service.sh clean"
     exit 1
 }
 
