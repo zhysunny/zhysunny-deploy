@@ -53,6 +53,7 @@ other(){
     echo ""
     step=${step}+1
     timedatectl set-timezone Asia/Shanghai
+    # 或者 cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 }
 
 COMMAND=$1
