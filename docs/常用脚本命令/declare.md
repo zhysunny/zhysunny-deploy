@@ -1,7 +1,7 @@
 # linux bash shell之declare
 **declare**或**typeset**内建命令(它们是完全相同的)可以用来限定变量的属性.这是在某些编程语言中使用的定义类型不严格的方式。命令declare是bash版本2之后才有的。命令typeset也可以在ksh脚本中运行。
 
-## 选项
+## 参数
 
 ### -r 只读
 

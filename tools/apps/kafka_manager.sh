@@ -19,7 +19,8 @@ installed_file=${INSTALL_PATH}/${KAFKA_PACKAGE_NAME}
 install(){
     if [[ -e ${installed_file} ]]
     then
-        rm -rf ${installed_file}
+        echo "kafka已安装"
+        exit 1
     fi
     tar -xvf ${KAFKA_INSTALL_FILE} -C ${INSTALL_PATH} >> ${LOCAL_LOGS_FILE} 2>&1
     # 修改环境变量
@@ -33,13 +34,16 @@ install(){
     hostname=`hostname`
     # 目前只做单机版
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "broker.id" "0"
+    ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "listeners" "PLAINTEXT://${hostname}:9092"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "host.name" "${hostname}"
+    ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "delete.topic.enable" "true"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "log.dirs" "${KAFKA_HOME}/logs"
-    ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "meaagse.max.byte" "5242880"
+    ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "message.max.bytes" "5242880"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "replica.fetch.max.bytes" "5242880"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "default.replication.factor" "1"
     ${PROPERTIES_CONFIG_TOOLS} put ${KAFKA_CONFIG_PATH}/server.properties "zookeeper.connect" "${hostname}:2181"
 
+    chmod 777 ${KAFKA_HOME}/bin/*.sh
     # 设置开机自启动
     cp ${LOCAL_TOOLS_SERVICE_PATH}/kafka.sh /etc/init.d/kafka
     ${PROPERTIES_CONFIG_TOOLS} put /etc/init.d/kafka "ENVIRONMENT" ${ENVIRONMENT_VARIABLE_FILE}

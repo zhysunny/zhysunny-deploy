@@ -31,7 +31,8 @@ install(){
     fi
     if [[ -e ${installed_file} ]]
     then
-        rm -rf ${installed_file}
+        echo "hive已安装"
+        exit 1
     fi
     tar -xvf ${HIVE_INSTALL_FILE} -C ${INSTALL_PATH} >>${LOCAL_LOGS_FILE} 2>&1
     mv ${INSTALL_PATH}/apache-${HIVE_PACKAGE_NAME}-bin ${installed_file}
@@ -72,7 +73,15 @@ install(){
     # 增加PATH
     sed -i 's/^export PATH=/export PATH=${HIVE_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
     source ${ENVIRONMENT_VARIABLE_FILE}
-    [[ $? -ne 0 ]] && exit $?
+    # 增加udf
+    HIVE_AUXLIB_PATH="${HIVE_HOME}/auxlib"
+    mkdir -p ${HIVE_AUXLIB_PATH}
+    cp ${LOCAL_TOOLS_PATH}/lib/zhysunny-hive-1.1.jar ${HIVE_AUXLIB_PATH}
+    # 修改日志配置
+    HIVE_LOG4J_FILE="${HIVE_HOME}/conf/hive-log4j.properties"
+    cp ${HIVE_LOG4J_FILE}.template ${HIVE_LOG4J_FILE}
+    ${XML_CONFIG_TOOLS} put ${HIVE_LOG4J_FILE} "hive.log.dir" "${HIVE_HOME}/logs"
+
     ${PROPERTIES_CONFIG_TOOLS} put ${LOCAL_VERSION_FILE} "version.hive" ${HIVE_VERSION}
     echo ""
     echo "Install hive successfully!!!"
@@ -108,7 +117,7 @@ uninstall(){
 }
 
 prepare(){
-    # 建库、建表、加载数据
+    # 建库、建表、加载数据，加载udf
     ${HIVE_HOME}/bin/hive << EOF
 create database if not exists badou;
 create table if not exists badou.aisles(aisle_id string, aisle string)row format delimited fields terminated by ',' stored as textfile;
@@ -118,6 +127,11 @@ create table if not exists badou.order_products_train(order_id string, product_i
 create table if not exists badou.orders(order_id string, user_id string, eval_set string, order_number string, order_dow string, order_hour_of_day string, days_since_prior_order string)row format delimited fields terminated by ',' stored as textfile;
 create table if not exists badou.products(product_id string, product_name string, aisle_id string, department_id string)row format delimited fields terminated by ',' stored as textfile;
 create table if not exists badou.udata(user_id string, item_id string, rating string, \`timestamp\` string)row format delimited fields terminated by '\t' stored as textfile;
+create database if not exists test;
+create table if not exists test.course(cid string, name string, tid string)row format delimited fields terminated by '\t' stored as textfile;
+create table if not exists test.score(sid string, cid string, score int)row format delimited fields terminated by '\t' stored as textfile;
+create table if not exists test.student(sid string, name string, birth string, gender int)row format delimited fields terminated by '\t' stored as textfile;
+create table if not exists test.teacher(tid string, name string)row format delimited fields terminated by '\t' stored as textfile;
 load data local inpath "${LOCAL_PATH}/data/hive/aisles.csv" into table badou.aisles;
 load data local inpath "${LOCAL_PATH}/data/hive/departments.csv" into table badou.departments;
 load data local inpath "${LOCAL_PATH}/data/hive/order_products_prior.csv" into table badou.order_products_prior;
@@ -125,12 +139,23 @@ load data local inpath "${LOCAL_PATH}/data/hive/order_products_train.csv" into t
 load data local inpath "${LOCAL_PATH}/data/hive/orders.csv" into table badou.orders;
 load data local inpath "${LOCAL_PATH}/data/hive/products.csv" into table badou.products;
 load data local inpath "${LOCAL_PATH}/data/hive/u.data" into table badou.udata;
+load data local inpath "${LOCAL_PATH}/data/hive/course.txt" into table test.course;
+load data local inpath "${LOCAL_PATH}/data/hive/score.txt" into table test.score;
+load data local inpath "${LOCAL_PATH}/data/hive/student.txt" into table test.student;
+load data local inpath "${LOCAL_PATH}/data/hive/teacher.txt" into table test.teacher;
+create function to_age as 'com.zhysunny.hive.udf.BirthToAge';
+create function avg_age as 'com.zhysunny.hive.udaf.AvgBirthToAge';
 EOF
 }
 
 clean(){
     # 删除数据库，cascade表示如果有表存在先删表在删库，不加cascade情况下有表的数据库不能删除
-    ${HIVE_HOME}/bin/hive -S -e "drop database if exists badou cascade;"
+    ${HIVE_HOME}/bin/hive << EOF
+drop database if exists badou cascade;
+drop database if exists test cascade;
+drop function to_age;
+drop function avg_age;
+EOF
 }
 
 COMMAND=$1

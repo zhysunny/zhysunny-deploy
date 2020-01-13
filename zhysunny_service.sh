@@ -6,15 +6,14 @@
 Usage()
 {
     echo "Usage："
-	echo "sh zhysunny_service.sh installVM <hostname>"
-	echo "sh zhysunny_service.sh getApps [apps]?"
-	echo "sh zhysunny_service.sh install [apps]?"
-	echo "sh zhysunny_service.sh uninstall [apps]?"
-	echo "sh zhysunny_service.sh prepare | install :   prepareOnlyCloudera & prepareOnlyES [--mysqlhost=] "
-	echo "sh zhysunny_service.sh start             :   startOnlyCloudera & startOnlyES  "
-	echo "sh zhysunny_service.sh stop              :   stopOnlyCloudera & stopOnlyES  "
-	echo "sh zhysunny_service.sh restart           :   restartOnlyCloudera & restartOnlyES  "
-	echo "sh zhysunny_service.sh clean | uninstall :   cleanOnlyCloudera & cleanOnlyES  "
+	echo "sh zhysunny_service.sh getApps [apps]*"
+	echo "sh zhysunny_service.sh install [apps]*"
+	echo "sh zhysunny_service.sh uninstall [apps]*"
+	echo "sh zhysunny_service.sh prepare"
+	echo "sh zhysunny_service.sh start"
+	echo "sh zhysunny_service.sh stop"
+	echo "sh zhysunny_service.sh restart"
+	echo "sh zhysunny_service.sh clean"
     exit 1
 }
 
@@ -272,84 +271,12 @@ clean(){
 uninstall(){
     getApps $*
 
-    if [[ `contains "jdk" ${INSTALL_APPS[*]}` -eq 0 ]]
+    if [[ `contains "kafka" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
         echo ""
-        echo "Step $step Start uninstall jdk ..."
+        echo "Step $step Start uninstall kafka ..."
         echo ""
-        ${LOCAL_TOOLS_APPS_PATH}/jdk_manager.sh uninstall
-        step=${step}+1
-    fi
-
-    if [[ `contains "scala" ${INSTALL_APPS[*]}` -eq 0 ]]
-    then
-        echo ""
-        echo "Step $step Start uninstall scala ..."
-        echo ""
-        ${LOCAL_TOOLS_APPS_PATH}/scala_manager.sh uninstall
-        step=${step}+1
-    fi
-
-    if [[ `contains "mysql" ${INSTALL_APPS[*]}` -eq 0 ]]
-    then
-        echo ""
-        echo "Step $step Start uninstall mysql ..."
-        echo ""
-        ${LOCAL_TOOLS_APPS_PATH}/mysql_manager.sh uninstall
-        step=${step}+1
-    fi
-
-    if [[ `contains "redis" ${INSTALL_APPS[*]}` -eq 0 ]]
-    then
-        echo ""
-        echo "Step $step Start uninstall redis ..."
-        echo ""
-        ${LOCAL_TOOLS_APPS_PATH}/redis_manager.sh uninstall
-        step=${step}+1
-    fi
-
-    if [[ `contains "hadoop" ${INSTALL_APPS[*]}` -eq 0 ]]
-    then
-        echo ""
-        echo "Step $step Start uninstall hadoop ..."
-        echo ""
-        ${LOCAL_TOOLS_APPS_PATH}/hadoop_manager.sh uninstall
-        step=${step}+1
-    fi
-
-    if [[ `contains "hive" ${INSTALL_APPS[*]}` -eq 0 ]]
-    then
-        echo ""
-        echo "Step $step Start uninstall hive ..."
-        echo ""
-        ${LOCAL_TOOLS_APPS_PATH}/hive_manager.sh uninstall
-        step=${step}+1
-    fi
-
-    if [[ `contains "zookeeper" ${INSTALL_APPS[*]}` -eq 0 ]]
-    then
-        echo ""
-        echo "Step $step Start uninstall zookeeper ..."
-        echo ""
-        ${LOCAL_TOOLS_APPS_PATH}/zookeeper_manager.sh uninstall
-        step=${step}+1
-    fi
-
-    if [[ `contains "hbase" ${INSTALL_APPS[*]}` -eq 0 ]]
-    then
-        echo ""
-        echo "Step $step Start uninstall hbase ..."
-        echo ""
-        ${LOCAL_TOOLS_APPS_PATH}/hbase_manager.sh uninstall
-        step=${step}+1
-    fi
-
-    if [[ `contains "phoenix" ${INSTALL_APPS[*]}` -eq 0 ]]
-    then
-        echo ""
-        echo "Step $step Start uninstall phoenix ..."
-        echo ""
-        ${LOCAL_TOOLS_APPS_PATH}/phoenix_manager.sh uninstall
+        ${LOCAL_TOOLS_APPS_PATH}/kafka_manager.sh uninstall
         step=${step}+1
     fi
 
@@ -362,12 +289,84 @@ uninstall(){
         step=${step}+1
     fi
 
-    if [[ `contains "kafka" ${INSTALL_APPS[*]}` -eq 0 ]]
+    if [[ `contains "phoenix" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
         echo ""
-        echo "Step $step Start uninstall kafka ..."
+        echo "Step $step Start uninstall phoenix ..."
         echo ""
-        ${LOCAL_TOOLS_APPS_PATH}/kafka_manager.sh uninstall
+        ${LOCAL_TOOLS_APPS_PATH}/phoenix_manager.sh uninstall
+        step=${step}+1
+    fi
+
+    if [[ `contains "hbase" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall hbase ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/hbase_manager.sh uninstall
+        step=${step}+1
+    fi
+
+    if [[ `contains "zookeeper" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall zookeeper ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/zookeeper_manager.sh uninstall
+        step=${step}+1
+    fi
+
+    if [[ `contains "hive" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall hive ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/hive_manager.sh uninstall
+        step=${step}+1
+    fi
+
+    if [[ `contains "hadoop" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall hadoop ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/hadoop_manager.sh uninstall
+        step=${step}+1
+    fi
+
+    if [[ `contains "redis" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall redis ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/redis_manager.sh uninstall
+        step=${step}+1
+    fi
+
+    if [[ `contains "mysql" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall mysql ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/mysql_manager.sh uninstall
+        step=${step}+1
+    fi
+
+    if [[ `contains "scala" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall scala ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/scala_manager.sh uninstall
+        step=${step}+1
+    fi
+
+    if [[ `contains "jdk" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall jdk ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/jdk_manager.sh uninstall
         step=${step}+1
     fi
 

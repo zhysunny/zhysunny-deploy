@@ -22,7 +22,8 @@ install(){
     # mysql目录是否已存在
     if [[ -e ${installed_file} ]]
     then
-        rm -rf ${installed_file}
+        echo "mysql已安装"
+        exit 1
     fi
     tar -xvf ${MYSQL_INSTALL_FILE} -C ${MYSQL_INSTALL_PATH} >>${LOCAL_LOGS_FILE} 2>&1
     # mysql用户组是否存在
