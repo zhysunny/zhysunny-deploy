@@ -36,6 +36,7 @@ install(){
     # 修改xml配置
     hostname=`hostname`
     cp ${PHOENIX_HOME}/phoenix-core-${PHOENIX_VERSION}.jar ${HBASE_HOME}/lib/
+    ${XML_CONFIG_TOOLS} put ${PHOENIX_HOME}/bin/hbase-site.xml "phoenix.schema.isNamespaceMappingEnabled" "true"
     # 重启hbase
     service hbase stop
     service hbase start
