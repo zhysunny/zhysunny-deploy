@@ -15,12 +15,28 @@ ES_PACKAGE_NAME=${ES_NAME}-${ES_VERSION}
 ES_INSTALL_FILE=${LOCAL_LIB_PATH}/${ES_NAME}/${ES_PACKAGE_NAME}.tar.gz
 # 已安装的程序目录
 installed_file=${INSTALL_PATH}/${ES_PACKAGE_NAME}
+# node
+NODE_PACKAGE_NAME=node-v10.16.0
+NODE_INSTALL_FILE=${LOCAL_LIB_PATH}/${ES_NAME}/${NODE_PACKAGE_NAME}.tar.gz
+node_installed_file=${INSTALL_PATH}/${NODE_PACKAGE_NAME}
+# head
+HEAD_PACKAGE_NAME=elasticsearch-head
+HEAD_INSTALL_FILE=${LOCAL_LIB_PATH}/${ES_NAME}/${HEAD_PACKAGE_NAME}.tar.gz
+head_installed_file=${INSTALL_PATH}/${HEAD_PACKAGE_NAME}
 
 install(){
     if [[ -e ${installed_file} ]]
     then
         echo "elasticsearch已安装"
         exit 1
+    fi
+    if [[ ! -e ${node_installed_file} ]]
+    then
+        tar -xvf ${NODE_INSTALL_FILE} -C ${INSTALL_PATH} >> ${LOCAL_LOGS_FILE} 2>&1
+    fi
+    if [[ ! -e ${head_installed_file} ]]
+    then
+        tar -xvf ${HEAD_INSTALL_FILE} -C ${INSTALL_PATH} >> ${LOCAL_LOGS_FILE} 2>&1
     fi
     tar -xvf ${ES_INSTALL_FILE} -C ${INSTALL_PATH} >> ${LOCAL_LOGS_FILE} 2>&1
     # elasticsearch用户是否存在
@@ -32,9 +48,14 @@ install(){
 	chown -R elasticsearch ${installed_file}
     # 修改环境变量
     ES_HOME=${installed_file}
+    NODE_HOME=${node_installed_file}
+    HEAD_HOME=${head_installed_file}
     ${PROPERTIES_CONFIG_TOOLS} put ${ENVIRONMENT_VARIABLE_FILE} "ES_HOME" ${ES_HOME} 1
+    ${PROPERTIES_CONFIG_TOOLS} put ${ENVIRONMENT_VARIABLE_FILE} "NODE_HOME" ${NODE_HOME} 1
+    ${PROPERTIES_CONFIG_TOOLS} put ${ENVIRONMENT_VARIABLE_FILE} "HEAD_HOME" ${HEAD_HOME} 1
     # 增加PATH
     sed -i 's/^export PATH=/export PATH=${ES_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
+    sed -i 's/^export PATH=/export PATH=${NODE_HOME}\/bin:/g' ${ENVIRONMENT_VARIABLE_FILE}
     source ${ENVIRONMENT_VARIABLE_FILE}
 
     ES_CONFIG_PATH=${ES_HOME}/config
@@ -44,6 +65,10 @@ install(){
     ${PROPERTIES_CONFIG_TOOLS} put ${ES_CONFIG_PATH}/elasticsearch.yml "path.data" "${ES_HOME}/data" 3
     ${PROPERTIES_CONFIG_TOOLS} put ${ES_CONFIG_PATH}/elasticsearch.yml "path.logs" "${ES_HOME}/logs" 3
     ${PROPERTIES_CONFIG_TOOLS} put ${ES_CONFIG_PATH}/elasticsearch.yml "network.host" "${hostname}" 3
+    ${PROPERTIES_CONFIG_TOOLS} put ${ES_CONFIG_PATH}/elasticsearch.yml "http.cors.enabled" "true" 3
+    ${PROPERTIES_CONFIG_TOOLS} put ${ES_CONFIG_PATH}/elasticsearch.yml "http.cors.allow-origin" "\"*\"" 3
+    ${PROPERTIES_CONFIG_TOOLS} put ${ES_CONFIG_PATH}/elasticsearch.yml "node.master" "true" 3
+    ${PROPERTIES_CONFIG_TOOLS} put ${ES_CONFIG_PATH}/elasticsearch.yml "node.data" "true" 3
     # linux默认es操作文件句柄数太小
     if [[ -z `cat /etc/security/limits.conf | grep "elasticsearch hard nofile 65536"` ]]
     then
@@ -78,6 +103,8 @@ uninstall(){
     if [[ -e ${installed_file} ]]
     then
         rm -rf ${installed_file}
+        rm -rf ${node_installed_file}
+        rm -rf ${head_installed_file}
     fi
     # mysql用户是否存在
 	if [[ -n "`cat /etc/shadow|grep elasticsearch`" ]]
@@ -87,10 +114,16 @@ uninstall(){
 	fi
     # 删除环境变量
     ES_HOME=${installed_file}
+    NODE_HOME=${node_installed_file}
+    HEAD_HOME=${head_installed_file}
     sed -i "/export ES_HOME=.*/d" ${ENVIRONMENT_VARIABLE_FILE}
+    sed -i "/export NODE_HOME=.*/d" ${ENVIRONMENT_VARIABLE_FILE}
+    sed -i "/export HEAD_HOME=.*/d" ${ENVIRONMENT_VARIABLE_FILE}
     # 删除PATH
     sed -i 's/${ES_HOME}\/bin://g' ${ENVIRONMENT_VARIABLE_FILE}
     sed -i 's/$ES_HOME\/bin://g' ${ENVIRONMENT_VARIABLE_FILE}
+    sed -i 's/${NODE_HOME}\/bin://g' ${ENVIRONMENT_VARIABLE_FILE}
+    sed -i 's/$NODE_HOME\/bin://g' ${ENVIRONMENT_VARIABLE_FILE}
 
     [[ $? -ne 0 ]] && exit $?
     echo ""

@@ -16,12 +16,19 @@ source ${ENVIRONMENT}
 start(){
     cd ${ES_HOME}/bin
     sudo -u elasticsearch sh elasticsearch > /dev/null &
+    cd ${HEAD_HOME}
+    grunt server -d > /dev/null &
     echo "Start Elasticsearch Server..."
 }
 
 stop(){
     cd ${ES_HOME}/bin
     kill $(jps|grep Elasticsearch|awk '{print $1}')
+    for exists_head in `lsof -i:9100 | sed -n '2,$p' | awk '{print $2}'`;do
+        if [[ ! -z "${exists_head}" ]];then
+          kill ${exists_head}
+        fi
+      done
     echo "Stop Elasticsearch Server..."
 }
 
