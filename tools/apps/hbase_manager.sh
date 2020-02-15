@@ -34,11 +34,12 @@ install(){
     HBASE_CONFIG_PATH=${HBASE_HOME}/conf
     hostname=`hostname`
     # 目前只做单机版
-    echo ${hostname} > $HBASE_CONFIG_PATH/regionservers
-    ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "hbase.tmp.dir" "file://${HBASE_HOME}/tmp"
+    echo ${hostname} > ${HBASE_CONFIG_PATH}/regionservers
+    ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "hbase.tmp.dir" "${HBASE_HOME}/tmp"
     ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "hbase.rootdir" "hdfs://${hostname}:8020/hbase"
-    ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "hbase.cluster.distributed" "true"
+    ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "hbase.cluster.distributed" "false"
     ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "hbase.zookeeper.quorum" "${hostname}"
+    ${XML_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-site.xml "phoenix.schema.isNamespaceMappingEnabled" "true"
     ${PROPERTIES_CONFIG_TOOLS} put ${HBASE_CONFIG_PATH}/hbase-env.sh "JAVA_HOME" ${JAVA_HOME} 1
 
     # 设置开机自启动
