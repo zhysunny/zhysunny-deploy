@@ -62,6 +62,8 @@ PROPERTIES_CONFIG_TOOLS=${LOCAL_TOOLS_PATH}/properties_config_tools.sh
 # mysql root密码
 MYSQL_ROOT_PASSWORD=`awk -F= '{if($1~/^mysql.root.password$/) print $2}' ${LOCAL_CONFIG_DEPLOY_FILE}`
 source ${LOCAL_TOOLS_PATH}/Arrays.sh
+# 修改/etc/sudoers，注释掉Defaults    requiretty
+sed -i 's/^Defaults    requiretty/#Defaults    requiretty/g' /etc/sudoers
 
 export LOCAL_PATH
 export LOCAL_CONFIG_PATH
@@ -183,7 +185,7 @@ install(){
         step=${step}+1
     fi
 
-    if [[ `contains "zookeeper" ${INSTALL_APPS[*]}` -eq 0 ]]
+    if [[ `contains "zookeeper" ${INSTALL_APPS[*]}` -eq 0 || `contains "zk" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
         echo ""
         echo "Step $step Start install zookeeper ..."
@@ -225,6 +227,15 @@ install(){
         echo "Step $step Start install kafka ..."
         echo ""
         ${LOCAL_TOOLS_APPS_PATH}/kafka_manager.sh install
+        step=${step}+1
+    fi
+
+    if [[ `contains "elasticsearch" ${INSTALL_APPS[*]}` -eq 0 || `contains "es" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start install elasticsearch ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/elasticsearch_manager.sh install
         step=${step}+1
     fi
 
@@ -271,6 +282,15 @@ clean(){
 uninstall(){
     getApps $*
 
+    if [[ `contains "elasticsearch" ${INSTALL_APPS[*]}` -eq 0 || `contains "es" ${INSTALL_APPS[*]}` -eq 0 ]]
+    then
+        echo ""
+        echo "Step $step Start uninstall elasticsearch ..."
+        echo ""
+        ${LOCAL_TOOLS_APPS_PATH}/elasticsearch_manager.sh uninstall
+        step=${step}+1
+    fi
+
     if [[ `contains "kafka" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
         echo ""
@@ -307,7 +327,7 @@ uninstall(){
         step=${step}+1
     fi
 
-    if [[ `contains "zookeeper" ${INSTALL_APPS[*]}` -eq 0 ]]
+    if [[ `contains "zookeeper" ${INSTALL_APPS[*]}` -eq 0 || `contains "zk" ${INSTALL_APPS[*]}` -eq 0 ]]
     then
         echo ""
         echo "Step $step Start uninstall zookeeper ..."

@@ -72,7 +72,8 @@ function put(){
     PROPERTY_VALUE=$3
     count=`grepCount ${FILE_NAME} ${PROPERTY_NAME}`
     # $4 = 1 表示设置环境变量，需要加export
-    # $4 = 2 表示设置变量为key value，中间是空格不是等于号
+    # $4 = 2 表示设置变量为key value，中间是空格
+    # $4 = 3 表示设置变量为key: value，中间是冒号空格
     # 其他情况下默认就是key=value的形式
     if [[ ${count} -eq 0 ]]
     then
@@ -90,6 +91,9 @@ function put(){
         elif [[ $4 -eq 2 ]]
         then
             echo "${PROPERTY_NAME} ${PROPERTY_VALUE}" >> ${FILE_NAME}
+        elif [[ $4 -eq 3 ]]
+        then
+            echo "${PROPERTY_NAME}: ${PROPERTY_VALUE}" >> ${FILE_NAME}
         else
             echo "${PROPERTY_NAME}=${PROPERTY_VALUE}" >> ${FILE_NAME}
         fi
@@ -102,6 +106,9 @@ function put(){
         elif [[ $4 -eq 2 ]]
         then
             sed -i "s/^${PROPERTY_NAME} .*/${PROPERTY_NAME} ${PROPERTY_VALUE}/g" ${FILE_NAME}
+        elif [[ $4 -eq 3 ]]
+        then
+            sed -i "s/^${PROPERTY_NAME}: .*/${PROPERTY_NAME}: ${PROPERTY_VALUE}/g" ${FILE_NAME}
         else
             sed -i "s/^${PROPERTY_NAME}=.*/${PROPERTY_NAME}=${PROPERTY_VALUE}/g" ${FILE_NAME}
         fi
